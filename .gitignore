@@ -1,0 +1,20 @@
+*.meta
+
+.vs
+.vsconfig
+Assembly-CSharp-Editor-firstpass.csproj
+Assembly-CSharp-firstpass.csproj
+Assembly-CSharp.csproj
+Assets/Assets_Crate_Barrels/
+Assets/Materials/
+Assets/Scenes/
+Assets/Standard Assets/
+Assets/Textures/
+FPSTemplates.sln
+Library
+Logs
+Packages
+ProjectSettings
+Temp
+UserSettings
+obj
