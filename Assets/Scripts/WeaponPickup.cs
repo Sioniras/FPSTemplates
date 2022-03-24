@@ -1,27 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Key : MonoBehaviour
+public class WeaponPickup : MonoBehaviour
 {
+	[Header("Weapon")]
 	/// <summary>
-	/// Which type of key to use - set the key names in the GameController instance.
+	/// Weapon to pickup, or null if no weapon is provided (only ammo box)
 	/// </summary>
-	public enum KeyType : byte
-	{
-		Key1 = 0,
-		Key2 = 1,
-		Key3 = 2,
-		Key4 = 3,
-		Key5 = 4,
-		Key6 = 5,
-		Key7 = 6,
-		Key8 = 7,
-	}
+	public WeaponSpecification WeaponType;
 
-	[Header("Key Type")]
+	[Header("Ammo")]
 	/// <summary>
-	/// Which type of key to use - set the key names in the GameController instance.
+	/// Ammo type to pickup.
 	/// </summary>
-	public KeyType Type;
+	public WeaponSpecification.WeaponAmmoType AmmoType;
+
+	/// <summary>
+	/// Amount of ammo to pickup.
+	/// </summary>
+	public uint AmmoAmount = 10;
 
 	[Header("Interactions")]
 	/// <summary>
@@ -47,16 +45,21 @@ public class Key : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		// Check whether the key can be picked up
+		// Check whether the weapon can be picked up
 		if ((UseInteractionKey && (GameController.Controller?.CheckForInteraction(transform.position, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false))
 			|| (UseAutoPickup && (GameController.Controller?.CheckForAutoInteraction(transform.position, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false)))
 		{
-			// Register that the player found the key
+			// Register that the player found the weapon
 			try
 			{
-				GameController.Controller.HasKey[(int)Type] = true;
+				// Pickup the weapon
+				if(WeaponType != null)
+					GameController.Controller?.SetHasWeapon(WeaponType, true);
+
+				// Add ammo for the weapon, or for the given ammo type if no weapon was specified
+				GameController.Controller?.AddAmmo(WeaponType?.AmmoType ?? AmmoType, AmmoAmount);
 			}
-			catch(System.Exception e)
+			catch (System.Exception e)
 			{
 				Debug.LogException(e);
 			}

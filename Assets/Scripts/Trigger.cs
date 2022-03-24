@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Trigger : MonoBehaviour
@@ -30,6 +28,16 @@ public class Trigger : MonoBehaviour
 	public bool UseAutoTrigger = false;
 
 	public float AutoTriggerDelay = 5.0f;
+
+	/// <summary>
+	/// A custom interaction distance that is used only if <seealso cref="UseDefaultInteractionDistance"/> is set to false.
+	/// </summary>
+	public float CustomInteractionDistance = 2.5f;
+
+	/// <summary>
+	/// Interaction distance is set to <seealso cref="GameController.InteractionDistance"/> if this is true, otherwise its set to <seealso cref="CustomInteractionDistance"/>.
+	/// </summary>
+	public bool UseDefaultInteractionDistance = true;
 	#endregion
 
 	public event TriggerEvent TriggerFired;
@@ -39,14 +47,14 @@ public class Trigger : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		bool hasAutoTriggered = (UseAutoTrigger && (GameController.Controller?.CheckForAutoInteraction(transform.position) ?? false));
+		bool hasAutoTriggered = (UseAutoTrigger && (GameController.Controller?.CheckForAutoInteraction(transform.position, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false));
 
 		if (hasAutoTriggered && (Time.time - autoTriggeredTime < AutoTriggerDelay))
 			hasAutoTriggered = false;
 
 		// If the door is open or closed, check for interaction and change state if needed
 		// Also check whether the door is unlocked or whether the player has the key
-		if (((UseInteractionKey && (GameController.Controller?.CheckForInteraction(transform.position) ?? false)) || hasAutoTriggered)
+		if (((UseInteractionKey && (GameController.Controller?.CheckForInteraction(transform.position, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false)) || hasAutoTriggered)
 			&& (!IsLocked || (GameController.Controller?.CheckKey(TriggerKey) ?? false)))
 		{
 			if(TriggerFired != null)

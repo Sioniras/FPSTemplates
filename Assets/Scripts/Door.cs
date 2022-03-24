@@ -60,6 +60,16 @@ public class Door : MonoBehaviour
 	/// </summary>
 	public bool UseAutoOpen = false;
 
+	/// <summary>
+	/// A custom interaction distance that is used only if <seealso cref="UseDefaultInteractionDistance"/> is set to false.
+	/// </summary>
+	public float CustomInteractionDistance = 2.5f;
+
+	/// <summary>
+	/// Interaction distance is set to <seealso cref="GameController.InteractionDistance"/> if this is true, otherwise its set to <seealso cref="CustomInteractionDistance"/>.
+	/// </summary>
+	public bool UseDefaultInteractionDistance = true;
+
 	[Header("Key")]
 	/// <summary>
 	/// If set to <c>true</c>, the door can only be opened when the player has the key.
@@ -94,10 +104,12 @@ public class Door : MonoBehaviour
 	// Private fields
 	private Vector3 interactionPosition;
 	private Vector3 startPosition;
+	private Vector3 targetPosition;
 	private Quaternion startRotation;
 	private Quaternion targetRotation;
-	private float openFraction;     // Linear interpolation fraction
+	private float openFraction;			// Linear interpolation fraction
 	private float autoCloseTimer;
+	private float triggerDelayTimer;
 
 	// Start is called before the first frame update
 	void Start()
@@ -117,9 +129,11 @@ public class Door : MonoBehaviour
 			startRotation = transform.rotation;
 		}
 
-		// Modify target position if delta is used
+
+		// Set the target position
+		targetPosition = TargetPosition;
 		if (MovementType == DoorMovementType.RelativeGlobalSpace || MovementType == DoorMovementType.LocalSpace)
-			TargetPosition += startPosition;
+			targetPosition += startPosition;
 
 		// Get the target rotation
 		targetRotation = startRotation * Quaternion.Euler(DeltaRotation);
@@ -169,16 +183,16 @@ public class Door : MonoBehaviour
 				if ((!IsLocked || (GameController.Controller?.CheckKey(DoorKey) ?? false)))
 				{
 					// If the door is open or closed, check for interaction keyboard press or auto open and change state if needed
-					if (UseInteractionKey && (GameController.Controller?.CheckForInteraction(interactionPosition) ?? false))
+					if (UseInteractionKey && (GameController.Controller?.CheckForInteraction(interactionPosition, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false))
 						State = (State == DoorState.Open ? DoorState.Closing : DoorState.Opening);
-					else if (UseAutoOpen && State == DoorState.Closed && (GameController.Controller?.CheckForAutoInteraction(interactionPosition) ?? false))
+					else if (UseAutoOpen && State == DoorState.Closed && (GameController.Controller?.CheckForAutoInteraction(interactionPosition, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false))
 						State = DoorState.Opening;
 				}
 
 				// Check for auto-close
 				if(CloseAutomatically && State == DoorState.Open && (Time.time - autoCloseTimer > AutoCloseDelay))
 				{
-					if (GameController.Controller?.CheckForAutoInteraction(interactionPosition) ?? false)
+					if (GameController.Controller?.CheckForAutoInteraction(interactionPosition, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false)
 						autoCloseTimer += 1.0f;
 					else
 						State = DoorState.Closing;
@@ -196,12 +210,12 @@ public class Door : MonoBehaviour
 		// Position uses linear interpolation, while rotation part uses spherical linear interpolation
 		if(MovementType == DoorMovementType.LocalSpace)
 		{
-			transform.localPosition = openFraction * TargetPosition + (1.0f - openFraction) * startPosition;
+			transform.localPosition = openFraction * targetPosition + (1.0f - openFraction) * startPosition;
 			transform.localRotation = Quaternion.Slerp(startRotation, targetRotation, openFraction);
 		}
 		else
 		{
-			transform.position = openFraction * TargetPosition + (1.0f - openFraction) * startPosition;
+			transform.position = openFraction * targetPosition + (1.0f - openFraction) * startPosition;
 			transform.rotation = Quaternion.Slerp(startRotation, targetRotation, openFraction);
 		}
 	}
