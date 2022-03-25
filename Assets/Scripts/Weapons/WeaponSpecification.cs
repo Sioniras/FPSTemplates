@@ -56,6 +56,7 @@ public class WeaponSpecification : MonoBehaviour
 	public float MuzzleFlashDuration = 0.1f;
 	public string FiringAnimation = "Fire";
 	public string ReloadingAnimation = "Reload";
+	public AudioSource FiringSound;
 
 	public uint AmmoInClip { get; private set; } = 0;
 	public WeaponState State { get; private set; } = WeaponState.Idle;
@@ -114,6 +115,8 @@ public class WeaponSpecification : MonoBehaviour
 
 				// Show the muzzle flash
 				MuzzleFlash?.gameObject.SetActive(true);
+
+				FiringSound?.Play();
 
 				FiringSpecification?.FireWeapon(this);
 			}
