@@ -4,10 +4,10 @@ public class Door : MonoBehaviour
 {
 	public enum DoorState
 	{
-		Open,       // Open, not moving
-		Opening,    // Was closed, now moving towards open state
-		Closed,     // Closed, not moving
-		Closing,    // Was open, now moving towards closed state
+		Open,		// Open, not moving
+		Opening,	// Was closed, now moving towards open state
+		Closed,		// Closed, not moving
+		Closing,	// Was open, now moving towards closed state
 	}
 
 	public enum DoorMovementType
