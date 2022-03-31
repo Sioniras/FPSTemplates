@@ -9,10 +9,11 @@ public class GameController : MonoBehaviour
 	[Header("Player")]
 	public GameObject Player;
 
-	[Header("Interactable Setup")]
+	[Header("Interaction Setup")]
 	public KeyCode InteractionKey = KeyCode.E;
 	public float InteractionDistance = 2.5f;
 	public float AutoInteractionDistance = 2.0f;
+	public float InteractionArcDegrees = 120.0f;
 
 	[Header("Keys")]
 	public string[] KeyNames = { "Red Key", "Green Key", "Blue Key", "Yellow Key", "Purple Key", "Golden Key", "Key Code", "Access Card" };
@@ -54,14 +55,23 @@ public class GameController : MonoBehaviour
 	/// <returns><c>true</c> if there should be an interaction, <c>false</c> otherwise.</returns>
 	public bool CheckForInteraction(Vector3 interactablePosition, float interactionDistance, bool useDefaultDistance, bool continousInteraction = false)
 	{
+		// Make sure that a player reference is set
+		if (Player == null)
+			return false;
+
 		// Check whether the interaction key was pressed
 		if (Input.GetKeyDown(InteractionKey) || (continousInteraction && Input.GetKey(InteractionKey)))
 		{
 			// Check whether the player is within interaction distance
-			Vector3 v = interactablePosition - (Player?.transform.position ?? Vector3.positiveInfinity);
-			if (v.magnitude < (useDefaultDistance ? InteractionDistance : interactionDistance))
+			Vector3 playerToObject = interactablePosition - Player.transform.position;
+			if (playerToObject.magnitude < (useDefaultDistance ? InteractionDistance : interactionDistance))
 			{
-				return true;
+				// Check whether the player is facing the object
+				Vector3 forward = Player.transform.TransformDirection(Vector3.forward);
+				forward.y = 0;			// Only consider the horizontal plane
+				playerToObject.y = 0;
+				if(Mathf.Acos(Vector3.Dot(playerToObject.normalized, forward.normalized)) * Mathf.Rad2Deg < InteractionArcDegrees / 2.0f)
+					return true;
 			}
 		}
 
