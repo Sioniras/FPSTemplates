@@ -38,6 +38,12 @@ public class Trigger : MonoBehaviour
 	/// Interaction distance is set to <seealso cref="GameController.InteractionDistance"/> if this is true, otherwise its set to <seealso cref="CustomInteractionDistance"/>.
 	/// </summary>
 	public bool UseDefaultInteractionDistance = true;
+
+	[Header("Other")]
+	/// <summary>
+	/// Whether the trigger should be activated by shooting at the trigger.
+	/// </summary>
+	public bool TriggerByWeaponFire = false;
 	#endregion
 
 	public event TriggerEvent TriggerFired;
@@ -63,5 +69,11 @@ public class Trigger : MonoBehaviour
 			if (hasAutoTriggered)
 				autoTriggeredTime = Time.time;
 		}
+	}
+
+	public void FireTrigger()
+	{
+		if (TriggerFired != null)
+			TriggerFired(this);
 	}
 }

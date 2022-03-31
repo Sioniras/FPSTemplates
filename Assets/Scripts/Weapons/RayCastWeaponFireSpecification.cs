@@ -9,22 +9,11 @@ public class RayCastWeaponFireSpecification : WeaponFireSpecification
 	public float ForceMagnitude = 5.0f;
 
 	[Header("Debugging")]
+	public bool LogHitTarget = false;
 	public bool ShowDebugLine = false;
 	public float DebugLineDuration = 1.0f;
 	public Color DebugLineHitColor = Color.green;
 	public Color DebugLineMissColor = Color.red;
-
-	// Start is called before the first frame update
-	void Start()
-	{
-		
-	}
-
-	// Update is called once per frame
-	void Update()
-	{
-		
-	}
 
 	public override void FireWeapon(WeaponSpecification weapon)
 	{
@@ -39,13 +28,21 @@ public class RayCastWeaponFireSpecification : WeaponFireSpecification
 
 		if (Physics.Raycast(start, direction, out RaycastHit hitInfo, Range))
 		{
+			if (LogHitTarget)
+				Debug.Log("Hit target: " + hitInfo.collider.name);
+
 			if (ShowDebugLine)
 				Debug.DrawLine(start, hitInfo.point, DebugLineHitColor, DebugLineDuration, true);
 
 			// Add a force to physics objects
 			var hitRigidBody = hitInfo.collider.GetComponent<Rigidbody>();
 			if(hitRigidBody != null)
-				hitRigidBody?.AddForceAtPosition(direction.normalized * ForceMagnitude, hitInfo.point, ForceMode.Impulse);
+				hitRigidBody.AddForceAtPosition(direction.normalized * ForceMagnitude, hitInfo.point, ForceMode.Impulse);
+
+			// Activate triggers
+			var trigger = hitInfo.collider.GetComponent<Trigger>();
+			if(trigger != null && trigger.TriggerByWeaponFire)
+				trigger.FireTrigger();
 		}
 		else
 		{
