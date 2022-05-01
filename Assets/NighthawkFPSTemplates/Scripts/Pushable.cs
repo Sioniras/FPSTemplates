@@ -11,7 +11,7 @@ public class Pushable : MonoBehaviour
 	/// <summary>
 	/// Fall speed for "fake/constant velocity" gravity (not using a proper acceleration)
 	/// </summary>
-	public float fallSpeed = 0.1f;
+	public float fallSpeed = 10.0f;
 
 	[Header("Interactions")]
 	/// <summary>
@@ -44,6 +44,6 @@ public class Pushable : MonoBehaviour
 		}
 
 		// Fake gravity - note that the fall speed is constant here... Physically wrong, but the player probably will not notice/care anyway
-		controller.Move(Vector3.down * fallSpeed);
+		controller.Move(Vector3.down * fallSpeed * Time.deltaTime);
 	}
 }

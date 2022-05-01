@@ -30,6 +30,9 @@ public class GameController : MonoBehaviour
 	public uint[] MaxAmmo = { 500, 250, 100, 200, 200, 50, 25, 25 };
 	public WeaponSpecification SelectedAtStartup;
 
+	[Header("Messages")]
+	public MessageField MessageFieldText;
+
 	// Properties
 	public WeaponSpecification CurrentWeapon { get; private set; }
 
@@ -46,6 +49,18 @@ public class GameController : MonoBehaviour
 		// Check whether the player wants to select a different weapon
 		CheckSelectWeapon();
 	}
+
+	#region Messages
+	/// <summary>
+	/// Displays a message to the user.
+	/// </summary>
+	/// <param name="message">The message to show.</param>
+	/// <param name="displayTime">Time in seconds to show the message.</param>
+	public static void DisplayMessage(string message, float displayTime = 10.0f)
+	{
+		Controller?.MessageFieldText?.DisplayMessage(message, displayTime);
+	}
+	#endregion
 
 	#region Interaction checks
 	/// <summary>
@@ -70,7 +85,7 @@ public class GameController : MonoBehaviour
 				Vector3 forward = Player.transform.TransformDirection(Vector3.forward);
 				forward.y = 0;			// Only consider the horizontal plane
 				playerToObject.y = 0;
-				if(Mathf.Acos(Vector3.Dot(playerToObject.normalized, forward.normalized)) * Mathf.Rad2Deg < InteractionArcDegrees / 2.0f)
+				if (Mathf.Acos(Vector3.Dot(playerToObject.normalized, forward.normalized)) * Mathf.Rad2Deg < InteractionArcDegrees / 2.0f)
 					return true;
 			}
 		}

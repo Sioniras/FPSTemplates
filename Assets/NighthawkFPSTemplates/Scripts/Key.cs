@@ -55,6 +55,7 @@ public class Key : MonoBehaviour
 			try
 			{
 				GameController.Controller.HasKey[(int)Type] = true;
+				GameController.DisplayMessage("Found " + GameController.Controller.KeyNames[(int)Type]);
 			}
 			catch(System.Exception e)
 			{

@@ -57,7 +57,16 @@ public class WeaponPickup : MonoBehaviour
 					GameController.Controller?.SetHasWeapon(WeaponType, true);
 
 				// Add ammo for the weapon, or for the given ammo type if no weapon was specified
-				GameController.Controller?.AddAmmo(WeaponType?.AmmoType ?? AmmoType, AmmoAmount);
+				if(WeaponType != null)
+				{
+					GameController.Controller?.AddAmmo(WeaponType.AmmoType, AmmoAmount);
+					GameController.DisplayMessage("Found " + WeaponType.Name);
+				}
+				else
+				{
+					GameController.Controller?.AddAmmo(AmmoType, AmmoAmount);
+					GameController.DisplayMessage("Found " + GameController.Controller.AmmoTypeNames[(int)AmmoType]);
+				}
 			}
 			catch (System.Exception e)
 			{
