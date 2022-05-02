@@ -4,10 +4,12 @@ public class Door : MonoBehaviour
 {
 	public enum DoorState
 	{
-		Open,		// Open, not moving
-		Opening,	// Was closed, now moving towards open state
-		Closed,		// Closed, not moving
-		Closing,	// Was open, now moving towards closed state
+		Open,           // Open, not moving
+		StartOpening,	// The door will e.g. start playing a sound and then transition into Opening state
+		Opening,		// Was closed, now moving towards open state
+		Closed,			// Closed, not moving
+		StartClosing,	// The door will e.g. start playing a sound and then transition into Closing state
+		Closing,		// Was open, now moving towards closed state
 	}
 
 	public enum DoorMovementType
@@ -96,6 +98,10 @@ public class Door : MonoBehaviour
 	/// Triggers can only close the door if <seealso cref="TriggerCanClose"/> is true.
 	/// </summary>
 	public bool TriggerCanClose = true;
+
+	[Header("Sounds")]
+	public AudioSource OpeningSound;
+	public AudioSource ClosingSound;
 	#endregion
 
 	// Properties
@@ -147,9 +153,9 @@ public class Door : MonoBehaviour
 	public void On_TriggerFired(Trigger trigger)
 	{
 		if (State == DoorState.Open && TriggerCanClose)
-			State = DoorState.Closing;
+			State = DoorState.StartClosing;
 		else if (State == DoorState.Closed && TriggerCanOpen)
-			State = DoorState.Opening;
+			State = DoorState.StartOpening;
 	}
 
 	// Update is called once per frame
@@ -157,6 +163,16 @@ public class Door : MonoBehaviour
 	{
 		switch (State)
 		{
+			case DoorState.StartOpening:
+				if (OpeningSound != null)
+					OpeningSound.Play();
+				State = DoorState.Opening;
+				break;
+			case DoorState.StartClosing:
+				if (ClosingSound != null)
+					ClosingSound.Play();
+				State = DoorState.Closing;
+				break;
 			case DoorState.Opening:
 				// Update fraction and state
 				openFraction += Speed * Time.deltaTime;
@@ -184,9 +200,9 @@ public class Door : MonoBehaviour
 				{
 					// If the door is open or closed, check for interaction keyboard press or auto open and change state if needed
 					if (UseInteractionKey && (GameController.Controller?.CheckForInteraction(interactionPosition, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false))
-						State = (State == DoorState.Open ? DoorState.Closing : DoorState.Opening);
+						State = (State == DoorState.Open ? DoorState.StartClosing : DoorState.StartOpening);
 					else if (UseAutoOpen && State == DoorState.Closed && (GameController.Controller?.CheckForAutoInteraction(interactionPosition, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false))
-						State = DoorState.Opening;
+						State = DoorState.StartOpening;
 				}
 
 				// Check for auto-close
@@ -195,7 +211,7 @@ public class Door : MonoBehaviour
 					if (GameController.Controller?.CheckForAutoInteraction(interactionPosition, CustomInteractionDistance, UseDefaultInteractionDistance) ?? false)
 						autoCloseTimer += 1.0f;
 					else
-						State = DoorState.Closing;
+						State = DoorState.StartClosing;
 				}
 				break;
 		}	

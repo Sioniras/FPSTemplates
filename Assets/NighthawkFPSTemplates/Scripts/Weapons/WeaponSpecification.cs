@@ -57,6 +57,7 @@ public class WeaponSpecification : MonoBehaviour
 	public string FiringAnimation = "Fire";
 	public string ReloadingAnimation = "Reload";
 	public AudioSource FiringSound;
+	public AudioSource PickupSound;
 
 	public uint AmmoInClip { get; private set; } = 0;
 	public WeaponState State { get; private set; } = WeaponState.Idle;

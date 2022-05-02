@@ -33,6 +33,10 @@ public class GameController : MonoBehaviour
 	[Header("Messages")]
 	public MessageField MessageFieldText;
 
+	[Header("Sounds")]
+	public AudioSource[] KeyPickupSound = new AudioSource[8];
+	public AudioSource[] AmmoPickupSound = new AudioSource[8];
+
 	// Properties
 	public WeaponSpecification CurrentWeapon { get; private set; }
 

@@ -56,6 +56,9 @@ public class Key : MonoBehaviour
 			{
 				GameController.Controller.HasKey[(int)Type] = true;
 				GameController.DisplayMessage("Found " + GameController.Controller.KeyNames[(int)Type]);
+
+				if (GameController.Controller.KeyPickupSound[(int)Type] != null)
+					GameController.Controller.KeyPickupSound[(int)Type].Play();
 			}
 			catch(System.Exception e)
 			{

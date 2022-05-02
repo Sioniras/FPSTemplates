@@ -52,20 +52,23 @@ public class WeaponPickup : MonoBehaviour
 			// Register that the player found the weapon
 			try
 			{
-				// Pickup the weapon
-				if(WeaponType != null)
-					GameController.Controller?.SetHasWeapon(WeaponType, true);
-
-				// Add ammo for the weapon, or for the given ammo type if no weapon was specified
+				// Pickup weapon and add ammo for it, or just add ammo for the given ammo type if no weapon was specified
 				if(WeaponType != null)
 				{
-					GameController.Controller?.AddAmmo(WeaponType.AmmoType, AmmoAmount);
+					GameController.Controller.SetHasWeapon(WeaponType, true);
+					GameController.Controller.AddAmmo(WeaponType.AmmoType, AmmoAmount);
 					GameController.DisplayMessage("Found " + WeaponType.Name);
+
+					if (WeaponType.PickupSound != null)
+						WeaponType.PickupSound.Play();
 				}
 				else
 				{
-					GameController.Controller?.AddAmmo(AmmoType, AmmoAmount);
+					GameController.Controller.AddAmmo(AmmoType, AmmoAmount);
 					GameController.DisplayMessage("Found " + GameController.Controller.AmmoTypeNames[(int)AmmoType]);
+
+					if (GameController.Controller.AmmoPickupSound[(int)AmmoType] != null)
+						GameController.Controller.AmmoPickupSound[(int)AmmoType].Play();
 				}
 			}
 			catch (System.Exception e)
