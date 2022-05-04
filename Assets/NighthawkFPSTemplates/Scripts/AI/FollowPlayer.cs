@@ -32,15 +32,21 @@ public class FollowPlayer : MonoBehaviour
 	public float MaxDistance = 10.0f;
 
 	/// <summary>
-	/// The Character Controller used to move the entity.
+	/// The RigidBody used to move the entity.
 	/// </summary>
-	public Rigidbody RB;
+	public Rigidbody RigidBody;
 
 	private AIState state = AIState.Idle;
 
 	// Start is called before the first frame update
 	void Start()
 	{
+		if(RigidBody == null)
+		{
+			RigidBody = GetComponent<Rigidbody>();
+			if(RigidBody == null)
+				RigidBody = gameObject.AddComponent<Rigidbody>();
+		}
 	}
 
 	// Use FixedUpdate rather than Update when dealing with physics
@@ -58,11 +64,11 @@ public class FollowPlayer : MonoBehaviour
 			case AIState.Following:
 				transform.LookAt(GameController.Controller.Player.transform);
 				var planeNewVel = transform.TransformDirection(Vector3.forward);
-				var planeOldVel = RB.velocity;
+				var planeOldVel = RigidBody.velocity;
 				planeNewVel.y = 0;
 				planeOldVel.y = 0;
 				var velocity = (planeNewVel.normalized * movementSpeed - planeOldVel);
-				RB.AddForce(velocity.normalized * movementSpeed, ForceMode.Acceleration);
+				RigidBody.AddForce(velocity.normalized * movementSpeed, ForceMode.Acceleration);
 				break;
 			case AIState.Idle:
 			default:
