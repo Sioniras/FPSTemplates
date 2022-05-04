@@ -31,19 +31,20 @@ public class FollowPlayer : MonoBehaviour
 	/// </summary>
 	public float MaxDistance = 10.0f;
 
+	/// <summary>
+	/// The Character Controller used to move the entity.
+	/// </summary>
+	public Rigidbody RB;
+
 	private AIState state = AIState.Idle;
-	private CharacterController controller;
 
 	// Start is called before the first frame update
 	void Start()
 	{
-		controller = GetComponent<CharacterController>();
-		if (controller == null)
-			controller = this.gameObject.AddComponent<CharacterController>();
 	}
 
-	// Update is called once per frame
-	void Update()
+	// Use FixedUpdate rather than Update when dealing with physics
+	void FixedUpdate()
 	{
 		if (GameController.Controller == null || GameController.Controller.Player == null)
 			return;
@@ -56,16 +57,17 @@ public class FollowPlayer : MonoBehaviour
 		{
 			case AIState.Following:
 				transform.LookAt(GameController.Controller.Player.transform);
-				var velocity = transform.TransformDirection(Vector3.forward).normalized * movementSpeed * Time.deltaTime;
-				controller.Move(velocity);
+				var planeNewVel = transform.TransformDirection(Vector3.forward);
+				var planeOldVel = RB.velocity;
+				planeNewVel.y = 0;
+				planeOldVel.y = 0;
+				var velocity = (planeNewVel.normalized * movementSpeed - planeOldVel);
+				RB.AddForce(velocity.normalized * movementSpeed, ForceMode.Acceleration);
 				break;
 			case AIState.Idle:
 			default:
 				// When idle, wait for player to get close
 				break;
 		}
-
-		// Fake gravity - note that the fall speed is constant here... Physically wrong, but the player probably will not notice/care anyway
-		controller.Move(Vector3.down * fallSpeed * Time.deltaTime);
 	}
 }
