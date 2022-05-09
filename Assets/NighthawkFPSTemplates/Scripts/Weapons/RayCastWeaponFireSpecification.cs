@@ -19,21 +19,10 @@ public class RayCastWeaponFireSpecification : WeaponFireSpecification
 	public Color DebugLineHitColor = Color.green;
 	public Color DebugLineMissColor = Color.red;
 
-	public override void FireWeapon(WeaponSpecification weapon)
+	public override void FireWeapon(Vector3 origin, Vector3 direction)
 	{
-		// Get the transform for the weapon (the point where the shot should originate)
-		var origin = weapon.VisualRepresentation.transform;
-		if (weapon.ShotOrigin == WeaponSpecification.FiringOrigin.PlayerPositionAndOrientation)
-			origin = GameController.Controller?.Player?.transform;
-		else if (weapon.ShotOrigin == WeaponSpecification.FiringOrigin.CameraPositionAndOrientation)
-			origin = GameController.Controller?.Player?.GetComponentInChildren<Camera>()?.gameObject.transform;
-
-		// Get initial position and direction of the raycast
-		Vector3 start = origin.position;
-		Vector3 direction = origin.TransformDirection(Vector3.forward);
-
 		// Perform the raycast to see if anything was hit
-		if (Physics.Raycast(start, direction, out RaycastHit hitInfo, Range))
+		if (Physics.Raycast(origin, direction, out RaycastHit hitInfo, Range))
 		{
 			// Notify about what was hit
 			if (LogHitTarget)
@@ -41,7 +30,7 @@ public class RayCastWeaponFireSpecification : WeaponFireSpecification
 
 			// Show debugging line if enabled (requires gizmos to be enabled in playmode)
 			if (ShowDebugLine)
-				Debug.DrawLine(start, hitInfo.point, DebugLineHitColor, DebugLineDuration, true);
+				Debug.DrawLine(origin, hitInfo.point, DebugLineHitColor, DebugLineDuration, true);
 
 			// Add a force to physics objects
 			var hitRigidBody = hitInfo.collider.GetComponent<Rigidbody>();
@@ -59,7 +48,7 @@ public class RayCastWeaponFireSpecification : WeaponFireSpecification
 
 			// Show debugging line if enabled (requires gizmos to be enabled in playmode)
 			if (ShowDebugLine)
-				Debug.DrawLine(start, start + direction.normalized * Range, DebugLineMissColor, DebugLineDuration, true);
+				Debug.DrawLine(origin, origin + direction.normalized * Range, DebugLineMissColor, DebugLineDuration, true);
 		}
 	}
 }

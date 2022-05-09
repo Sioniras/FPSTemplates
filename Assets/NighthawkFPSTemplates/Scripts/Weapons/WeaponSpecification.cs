@@ -119,7 +119,7 @@ public class WeaponSpecification : MonoBehaviour
 
 				FiringSound?.Play();
 
-				FiringSpecification?.FireWeapon(this);
+				FiringSpecification?.PlayerFireWeapon(this);
 			}
 			else
 			{

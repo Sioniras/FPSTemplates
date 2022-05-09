@@ -12,23 +12,15 @@ public class PhysicsBodyWeaponFireSpecification : WeaponFireSpecification
 	/// </summary>
 	public float ProjectileVelocity = 10.0f;
 
-	public override void FireWeapon(WeaponSpecification weapon)
+	public override void FireWeapon(Vector3 origin, Vector3 direction)
 	{
-		// Get the transform for the weapon (the point where the shot should originate)
-		var origin = weapon.VisualRepresentation.transform;
-		if (weapon.ShotOrigin == WeaponSpecification.FiringOrigin.PlayerPositionAndOrientation)
-			origin = GameController.Controller?.Player?.transform;
-		else if (weapon.ShotOrigin == WeaponSpecification.FiringOrigin.CameraPositionAndOrientation)
-			origin = GameController.Controller?.Player?.GetComponentInChildren<Camera>()?.gameObject.transform;
-
-		// Get initial position and velocity
-		Vector3 start = origin.position;
-		Vector3 velocity = origin.TransformDirection(Vector3.forward).normalized * ProjectileVelocity;
+		// Get initial velocity
+		Vector3 velocity = direction.normalized * ProjectileVelocity;
 
 		// Make a copy of the projectile, set it active and place it at the weapon/shooting position
 		var projectile = GameObject.Instantiate(Projectile);
 		projectile.SetActive(true);
-		projectile.transform.position = start;
+		projectile.transform.position = origin;
 
 		// Get a rigid body on the new projectile
 		var rb = projectile.GetComponent<Rigidbody>();
