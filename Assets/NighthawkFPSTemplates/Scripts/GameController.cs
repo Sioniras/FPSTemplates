@@ -329,6 +329,9 @@ public class GameController : MonoBehaviour
 
 	public void SetActiveWeapon(WeaponSpecification weapon)
 	{
+		if (weapon == null || PlayerHasDied)
+			return;
+
 		if (GetHasWeapon(weapon))
 		{
 			CurrentWeapon = weapon;
@@ -346,6 +349,7 @@ public class GameController : MonoBehaviour
 
 		PlayerHasDied = true;
 		Player.GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
+		CurrentWeapon = null;
 
 		StartCoroutine(AnimateDie());
 	}

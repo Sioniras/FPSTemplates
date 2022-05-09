@@ -27,6 +27,16 @@ public class Trap : MonoBehaviour
 	/// </summary>
 	public float Period = 5.0f;
 
+	/// <summary>
+	/// The periodic firing of the trap is suspended when the player is closer to the trap than <see cref="ClosestDistance"/>.
+	/// </summary>
+	public float ClosestDistance = 0.0f;
+
+	/// <summary>
+	/// The periodic firing of the trap is suspended when the player is farther away than <see cref="MaxDistance"/>.
+	/// </summary>
+	public float MaxDistance = 50.0f;
+
 	[Header("Triggers")]
 	/// <summary>
 	/// Reference to trigger that can activate the trap.
@@ -55,8 +65,16 @@ public class Trap : MonoBehaviour
 	{
 		if (IsPeriodic && (lastPeriodicAction + Period < Time.time))
 		{
-			lastPeriodicAction = Time.time;
-			FireTrap();
+			float distance = (MaxDistance + ClosestDistance) / 2.0f;
+
+			if(GameController.Controller != null && GameController.Controller.Player != null)
+				distance = (transform.position - GameController.Controller.Player.transform.position).magnitude;
+
+			if (distance > ClosestDistance || distance < MaxDistance)
+			{
+				lastPeriodicAction = Time.time;
+				FireTrap();
+			}
 		}
 	}
 

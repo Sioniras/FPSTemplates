@@ -62,6 +62,7 @@ MonoBehaviour:
   FiringAnimation: Fire
   ReloadingAnimation: Reload
   FiringSound: {fileID: 0}
+  PickupSound: {fileID: 0}
 --- !u!1 &1651767326289796632
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,6 +208,7 @@ MonoBehaviour:
   FiringAnimation: Fire
   ReloadingAnimation: Reload
   FiringSound: {fileID: 0}
+  PickupSound: {fileID: 0}
 --- !u!1 &1651767327055459515
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,6 +401,7 @@ MonoBehaviour:
   FiringAnimation: Fire
   ReloadingAnimation: Reload
   FiringSound: {fileID: 0}
+  PickupSound: {fileID: 0}
 --- !u!1 &8439051671693729825
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,6 +412,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1525810047917026698}
   - component: {fileID: 1518398140433218619}
+  - component: {fileID: 4808004305480870317}
   - component: {fileID: 3448708812728128168}
   - component: {fileID: 2488172662011814101}
   m_Layer: 0
@@ -440,6 +444,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8439051671693729825}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &4808004305480870317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8439051671693729825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c1b750fc86490e4e8bc61d6d7162625, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Damage: 10
+  Lifetime: 30
 --- !u!23 &3448708812728128168
 MeshRenderer:
   m_ObjectHideFlags: 0

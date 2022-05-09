@@ -30,8 +30,6 @@ public class Projectile : MonoBehaviour
 
 		hasCollided = true;
 
-		Debug.Log(collision.gameObject.name);
-
 		CombatEntity target = collision.gameObject.GetComponent<CombatEntity>();
 		if (target != null)
 		{
