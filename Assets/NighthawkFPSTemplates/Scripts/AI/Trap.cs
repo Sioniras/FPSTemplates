@@ -65,12 +65,12 @@ public class Trap : MonoBehaviour
 	{
 		if (IsPeriodic && (lastPeriodicAction + Period < Time.time))
 		{
-			float distance = (MaxDistance + ClosestDistance) / 2.0f;
+			float distance = float.PositiveInfinity;
 
 			if(GameController.Controller != null && GameController.Controller.Player != null)
 				distance = (transform.position - GameController.Controller.Player.transform.position).magnitude;
 
-			if (distance > ClosestDistance || distance < MaxDistance)
+			if (distance > ClosestDistance && distance < MaxDistance)
 			{
 				lastPeriodicAction = Time.time;
 				FireTrap();
