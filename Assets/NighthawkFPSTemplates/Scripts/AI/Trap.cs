@@ -5,7 +5,7 @@ using UnityEngine;
 public class Trap : MonoBehaviour
 {
 	#region Public fields that can be set in the editor
-	[Header("Action")]
+	[Header("Basic Setup")]
 	/// <summary>
 	/// The action that happens when the trap is triggered.
 	/// </summary>
@@ -15,6 +15,17 @@ public class Trap : MonoBehaviour
 	/// Position offset for the trap fire action.
 	/// </summary>
 	public Vector3 TrapOffset = Vector3.zero;
+
+	[Header("Periodic Trap")]
+	/// <summary>
+	/// If set to <c>true</c>, the <see cref="TrapAction"/> will be fired periodically.
+	/// </summary>
+	public bool IsPeriodic = false;
+
+	/// <summary>
+	/// Time between two trap actions.
+	/// </summary>
+	public float Period = 5.0f;
 
 	[Header("Triggers")]
 	/// <summary>
@@ -29,6 +40,7 @@ public class Trap : MonoBehaviour
 	#endregion
 
 	private float lastTrigger = float.NegativeInfinity;
+	private float lastPeriodicAction = float.NegativeInfinity;
 
 	// Start is called before the first frame update
 	void Start()
@@ -36,6 +48,16 @@ public class Trap : MonoBehaviour
 		// Register trigger
 		if (TrapTrigger != null)
 			TrapTrigger.TriggerFired += On_TriggerFired;
+	}
+
+	// Update is called once per frame
+	void Update()
+	{
+		if (IsPeriodic && (lastPeriodicAction + Period < Time.time))
+		{
+			lastPeriodicAction = Time.time;
+			FireTrap();
+		}
 	}
 
 	// Triggers can fire the trap action
@@ -53,7 +75,9 @@ public class Trap : MonoBehaviour
 	/// </summary>
 	public void FireTrap()
 	{
+		var offset = transform.TransformVector(TrapOffset);
+
 		// Uses position and rotation of the GameObject, but the position can be offset
-		TrapAction?.FireWeapon(transform.position + TrapOffset, transform.TransformDirection(Vector3.forward));
+		TrapAction?.FireWeapon(transform.position + offset, transform.TransformDirection(Vector3.forward));
 	}
 }
