@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -8,6 +9,8 @@ public class GameController : MonoBehaviour
 
 	[Header("Player")]
 	public GameObject Player;
+	public bool PlayerCanDie = false;
+	public float PlayerMaxHealth = 100.0f;
 
 	[Header("Interaction Setup")]
 	public KeyCode InteractionKey = KeyCode.E;
@@ -40,11 +43,22 @@ public class GameController : MonoBehaviour
 	// Properties
 	public WeaponSpecification CurrentWeapon { get; private set; }
 
+	public CombatEntity PlayerCombatEntity { get; private set; }
+
+	public bool PlayerHasDied { get; private set; }
+
 	// Start is called before the first frame update
 	void Start()
 	{
 		Controller = this;
 		SetActiveWeapon(SelectedAtStartup);
+
+		if(Player != null && PlayerCanDie)
+		{
+			PlayerCombatEntity = Player.GetComponent<CombatEntity>();
+			if (PlayerCombatEntity == null)
+				PlayerCombatEntity = Player.AddComponent<CombatEntity>();
+		}
 	}
 
 	// Update is called once per frame
@@ -52,6 +66,10 @@ public class GameController : MonoBehaviour
 	{
 		// Check whether the player wants to select a different weapon
 		CheckSelectWeapon();
+
+		// Check whether the player has died
+		if(PlayerCanDie && !PlayerHasDied && PlayerCombatEntity != null && PlayerCombatEntity.IsDead)
+			Die();
 	}
 
 	#region Messages
@@ -75,7 +93,7 @@ public class GameController : MonoBehaviour
 	public bool CheckForInteraction(Vector3 interactablePosition, float interactionDistance, bool useDefaultDistance, bool continousInteraction = false)
 	{
 		// Make sure that a player reference is set
-		if (Player == null)
+		if (Player == null || PlayerHasDied)
 			return false;
 
 		// Check whether the interaction key was pressed
@@ -104,8 +122,12 @@ public class GameController : MonoBehaviour
 	/// <returns><c>true</c> if there should be an interaction, <c>false</c> otherwise.</returns>
 	public bool CheckForAutoInteraction(Vector3 interactablePosition, float interactionDistance, bool useDefaultDistance)
 	{
+		// Make sure that a player reference is set
+		if (Player == null || PlayerHasDied)
+			return false;
+
 		// Check whether the player is within interaction distance
-		Vector3 v = interactablePosition - (Player?.transform.position ?? Vector3.positiveInfinity);
+		Vector3 v = interactablePosition - Player.transform.position;
 		if (v.magnitude < (useDefaultDistance ? AutoInteractionDistance : interactionDistance))
 			return true;
 
@@ -203,7 +225,8 @@ public class GameController : MonoBehaviour
 	/// <returns><c>true</c> if the player has pressed the <seealso cref="FireKey"/> and weapon state is ok, <c>false</c> otherwise.</returns>
 	public bool CheckFireWeaponRequested(WeaponSpecification weapon)
 	{
-		if (weapon.State == WeaponSpecification.WeaponState.Idle && ((weapon.AutomaticFire && Input.GetKey(FireKey)) || Input.GetKeyDown(FireKey)))
+		if (weapon.State == WeaponSpecification.WeaponState.Idle && ((weapon.AutomaticFire && Input.GetKey(FireKey)) || Input.GetKeyDown(FireKey))
+			&& !PlayerHasDied)
 			return true;
 
 		return false;
@@ -216,7 +239,8 @@ public class GameController : MonoBehaviour
 	/// <returns><c>true</c> if the player has pressed the <seealso cref="ReloadKey"/> and weapon state is ok, <c>false</c> otherwise.</returns>
 	public bool CheckReloadWeaponRequested(WeaponSpecification weapon)
 	{
-		if (weapon.State == WeaponSpecification.WeaponState.Idle && (Input.GetKeyDown(ReloadKey) || (weapon.AutoReload && weapon.AmmoInClip == 0)))
+		if (weapon.State == WeaponSpecification.WeaponState.Idle && (Input.GetKeyDown(ReloadKey) || (weapon.AutoReload && weapon.AmmoInClip == 0))
+			&& !PlayerHasDied)
 			return true;
 
 		return false;
@@ -314,4 +338,35 @@ public class GameController : MonoBehaviour
 		}
 	}
 	#endregion
+
+	public void Die()
+	{
+		if (Player == null || !PlayerCanDie)
+			return;
+
+		PlayerHasDied = true;
+		Player.GetComponent<UnityStandardAssets.Characters.FirstPerson.FirstPersonController>().enabled = false;
+
+		StartCoroutine(AnimateDie());
+	}
+
+	private IEnumerator AnimateDie()
+	{
+		const float deathAnimationSpeed = 1.0f;
+		Vector3 currentScale = Player.transform.localScale;
+		Vector3 targetScale = new Vector3(currentScale.x, currentScale.y / 100.0f, currentScale.z);
+		Quaternion currentRotation = Player.transform.rotation;
+		Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, 80.0f));
+
+		var waiter = new WaitForEndOfFrame();
+
+		for (float lambda = 0; lambda < 1; lambda += deathAnimationSpeed * Time.deltaTime)
+		{
+			Player.transform.localScale = lambda * targetScale + (1.0f - lambda) * currentScale;
+			Player.transform.rotation = Quaternion.Slerp(currentRotation, targetRotation, lambda);
+			yield return waiter;
+		}
+		Player.transform.localScale = targetScale;
+		Player.transform.rotation = targetRotation;
+	}
 }
