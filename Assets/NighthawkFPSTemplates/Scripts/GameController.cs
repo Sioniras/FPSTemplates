@@ -40,6 +40,7 @@ public class GameController : MonoBehaviour
 	[Header("Sounds")]
 	public AudioSource[] KeyPickupSound = new AudioSource[8];
 	public AudioSource[] AmmoPickupSound = new AudioSource[8];
+	public AudioSource HealthPickupSound;
 
 	// Properties
 	public WeaponSpecification CurrentWeapon { get; private set; }
