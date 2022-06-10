@@ -48,6 +48,9 @@ public class Crosshair : MonoBehaviour
 			GetComponent<RectTransform>().anchorMax = new Vector2(0.5f, 0.5f);
 			GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
 		}
+
+		if (GameController.Controller != null && GameController.Controller.PlayerHasDied)
+			this.gameObject.SetActive(false);
 	}
 
 	public Vector3 GetAimingPosition(WeaponSpecification weapon)

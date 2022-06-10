@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
 	public GameObject Player;
 	public bool PlayerCanDie = false;
 	public float PlayerMaxHealth = 100.0f;
+	public GameOverPanel GameOverPanel;
 
 	[Header("Interaction Setup")]
 	public KeyCode InteractionKey = KeyCode.E;
@@ -372,5 +373,7 @@ public class GameController : MonoBehaviour
 		}
 		Player.transform.localScale = targetScale;
 		Player.transform.rotation = targetRotation;
+
+		GameOverPanel?.Show();
 	}
 }
